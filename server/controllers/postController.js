@@ -3,6 +3,7 @@ import Post from "../models/Post.js";
 export const getAllPost = async (req, res) => {
   try {
     const posts = await Post.find()
+      .select("-imageBuffer")
       .populate("user", "name username profilePic") // corrected "User" → "user"
       .populate("comments.user", "name username profilePic")
       .sort({ createdAt: -1 });
@@ -11,6 +12,27 @@ export const getAllPost = async (req, res) => {
   } catch (err) {
     console.error("Get All Posts Error:", err);
     res.status(500).json({ message: "Error fetching posts" });
+  }
+};
+
+export const getImage = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const post = await Post.findById(id);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+
+    if (post.imageBuffer) {
+      res.set("Content-Type", post.imageBuffer.contentType);
+      return res.send(post.imageBuffer.data);
+    }
+
+    res.status(404).json({ message: "Image not available" });
+  } catch (err) {
+    console.error("Get Image Error:", err);
+    res.status(500).json({ message: "Error fetching image" });
   }
 };
 
@@ -30,7 +52,10 @@ export const createPost = async (req, res) => {
     const newPost = new Post({
       user: req.user._id,
       description,
-      image: req.file ? req.file.filename : null,
+      imageBuffer: {
+        data: req.file ? req.file.buffer : null,
+        contentType: req.file ? req.file.mimetype : null,
+      },
     });
 
     await newPost.save();

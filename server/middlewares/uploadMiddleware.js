@@ -1,22 +1,8 @@
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 
 // Set storage engine
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const folder = "uploads/posts";
-    if (!fs.existsSync(folder)) {
-      fs.mkdirSync(folder, { recursive: true });
-    }
-    cb(null, folder);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const uniqueName = `${file.fieldname}-${Date.now()}${ext}`;
-    cb(null, uniqueName);
-  },
-});
+const storage = multer.memoryStorage();
 
 // File filter
 const fileFilter = (req, file, cb) => {
