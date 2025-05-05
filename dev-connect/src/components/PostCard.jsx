@@ -4,6 +4,7 @@ import { likePost, unlikePost } from '../redux/thunk/postThunks';
 import { formatDistanceToNow } from 'date-fns';
 import { FiHeart, FiMessageSquare, FiMoreHorizontal, FiTrash2 } from 'react-icons/fi';
 import { toast } from 'sonner';
+import PostImage from './PostImage'
 
 const PostCard = ({ post, currentUserId, onDelete }) => {
   const dispatch = useDispatch();
@@ -91,13 +92,7 @@ const PostCard = ({ post, currentUserId, onDelete }) => {
       {/* Post Content */}
       <div className="px-4 pb-2">
         <p className="text-gray-800 mb-3">{post.description}</p>
-        {post.image && (
-          <img 
-            src={`http://localhost:3000/uploads/posts/${post.image}`} 
-            alt="Post content" 
-            className="w-full h-auto rounded-lg object-cover max-h-96"
-          />
-        )}
+        <PostImage id={post._id} image={post.image} />
       </div>
 
       {/* Post Actions */}
